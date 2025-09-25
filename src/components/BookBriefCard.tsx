@@ -17,9 +17,9 @@ const BookBriefCard: React.FC<BookBriefCardProps> = ({
   rating,
 }) => {
   return (
-    <Link to={`/book/${id}`} className='group'>
-      <div className='flex h-full flex-col overflow-hidden rounded-[12px] bg-white shadow-[0_0_20px_0_#CBCACA40] group-hover:bg-neutral-100'>
-        {/* Images */}
+    <div className='group flex h-full flex-col overflow-hidden rounded-[12px] bg-white shadow-[0_0_20px_0_#CBCACA40] group-hover:bg-neutral-100'>
+      {/* Images */}
+      <Link to={`/book/${id}`}>
         <div className='flex aspect-[2/3] items-center justify-between overflow-hidden'>
           <img
             src={
@@ -32,22 +32,27 @@ const BookBriefCard: React.FC<BookBriefCardProps> = ({
             className='w-full object-cover object-center transition-all duration-300 group-hover:scale-105'
           />
         </div>
+      </Link>
 
-        {/* Details */}
-        <div className='flex flex-col gap-[2px] p-3 md:gap-1 md:p-4'>
+      {/* Details */}
+      <div className='flex flex-col gap-[2px] p-3 md:gap-1 md:p-4'>
+        <Link to={`/book/${id}`}>
           <span className='group-hover:text-primary-300 font-bold text-neutral-900 md:text-lg'>
             {title}
           </span>
+        </Link>
+
+        <Link to={`/author/i${id}`}>
           <span className='text-neutral-700'>{authorName}</span>
-          <div className='flex items-center gap-1'>
-            <Star className='size-6 fill-[#FFAB0D] stroke-0' />
-            <span className='font-semibold text-neutral-900'>
-              {rating.toFixed(1)}
-            </span>
-          </div>
+        </Link>
+        <div className='flex items-center gap-1'>
+          <Star className='size-6 fill-[#FFAB0D] stroke-0' />
+          <span className='font-semibold text-neutral-900'>
+            {rating.toFixed(1)}
+          </span>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

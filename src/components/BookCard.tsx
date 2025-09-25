@@ -13,6 +13,7 @@ type CardComponentProps = {
   reviewCount: number;
   description: string;
   availableCopies: number;
+  authorId: number;
 };
 
 const CardComponent: React.FC<CardComponentProps> = ({
@@ -25,6 +26,7 @@ const CardComponent: React.FC<CardComponentProps> = ({
   reviewCount,
   description,
   availableCopies,
+  authorId,
 }) => {
   const navigate = useNavigate();
   const [inCart, setInCart] = useState(() => {
@@ -53,13 +55,15 @@ const CardComponent: React.FC<CardComponentProps> = ({
   return (
     <div className='flex flex-col justify-center gap-9 md:flex-row md:justify-start'>
       {/* Image */}
-      <img
-        src={coverImage ?? '/images/book-no-cover.jpg'}
-        alt={title}
-        loading='lazy'
-        onError={(e) => (e.currentTarget.src = '/images/book-no-cover.jpg')}
-        className='mx-auto h-[330px] md:mx-0 md:h-[500px]'
-      />
+      <Link to={`/preview/${id}`}>
+        <img
+          src={coverImage ?? '/images/book-no-cover.jpg'}
+          alt={title}
+          loading='lazy'
+          onError={(e) => (e.currentTarget.src = '/images/book-no-cover.jpg')}
+          className='mx-auto h-[330px] md:mx-0 md:h-[500px]'
+        />
+      </Link>
 
       {/* Details */}
       <div className='flex flex-col gap-3 md:gap-5'>
@@ -72,7 +76,9 @@ const CardComponent: React.FC<CardComponentProps> = ({
               {title}
             </span>
           </Link>
-          <span className='text-neutral-700'>{authorName}</span>
+          <Link to={`/author/${authorId}`}>
+            <span className='text-neutral-700'>{authorName}</span>
+          </Link>
           <div className='flex items-center gap-[2px]'>
             <Star fill='#FFAB0D' stroke='none' className='size-6' />
             <span className='text-md font-bold text-neutral-900'>

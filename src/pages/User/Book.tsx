@@ -34,6 +34,7 @@ const Book = () => {
         reviewCount={BooksQueryData.data.reviewCount}
         description={BooksQueryData.data.description}
         availableCopies={BooksQueryData.data.availableCopies}
+        authorId={BooksQueryData.data.authorId}
       />
 
       {/* Line */}
