@@ -1,14 +1,17 @@
 import BookBriefCard from '@/components/BookBriefCard';
 import BookCard from '@/components/BookCard';
 import Loading from '@/components/Loading';
+import { Button } from '@/components/ui/button';
 import { useBooksQuery, useBooksRecommendationQuery } from '@/hooks/useBooks';
 import dayjs from 'dayjs';
 import { Star } from 'lucide-react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 const Book = () => {
   const { id } = useParams();
   const { BooksQueryData } = useBooksQuery(Number(id));
+  const [showAllReviews, setShowAllReviews] = useState<boolean>(false);
 
   const { BooksRecommendationData } = useBooksRecommendationQuery({
     categoryId: BooksQueryData?.data.categoryId,
@@ -19,6 +22,10 @@ const Book = () => {
   if (!BooksQueryData || !BooksRecommendationData) {
     return <Loading />;
   }
+
+  const displayedFilter = showAllReviews
+    ? BooksQueryData.data.reviews
+    : BooksQueryData.data.reviews.slice(0, 6);
 
   return (
     <div className='flex flex-col gap-6 md:gap-16'>
@@ -45,45 +52,57 @@ const Book = () => {
         </div>
 
         {/* Review Card */}
-        <div className='grid grid-cols-1 gap-x-5 gap-y-[18px] md:grid-cols-2'>
-          {BooksQueryData.data.reviews.map((review) => (
-            <div
-              key={'Review' + review.id}
-              className='flex flex-col gap-4 rounded-[16px] bg-white p-4 shadow-[0_0_20px_0_#CBCACA40]'
-            >
-              {/* Profile */}
-              <div className='flex items-center gap-3'>
-                <img
-                  src='/images/author-profile.png'
-                  alt='Profile Picture'
-                  className='size-[58px] rounded-full md:size-16'
-                />
-                <div className='flex flex-col'>
-                  <span className='md:text-lg'>{review.user.name}</span>
-                  <span>
-                    {dayjs(review.createdAt).format('DD MMMM YYYY, HH:mm')}
-                  </span>
-                </div>
-              </div>
-
-              {/* Review Content */}
-              <div className='flex flex-col gap-2'>
-                {/* Star */}
-                <div className='flex items-center gap-[2px]'>
-                  {Array.from({ length: review.star }).map((_, index) => (
-                    <Star
-                      key={'star: ' + index}
-                      className='size-6 fill-[#FFAB0D] stroke-0'
-                    />
-                  ))}
+        <div className='flex flex-col gap-[18px]'>
+          <div className='grid grid-cols-1 gap-x-5 gap-y-[18px] md:grid-cols-2'>
+            {displayedFilter.map((review) => (
+              <div
+                key={'Review' + review.id}
+                className='flex flex-col gap-4 rounded-[16px] bg-white p-4 shadow-[0_0_20px_0_#CBCACA40]'
+              >
+                {/* Profile */}
+                <div className='flex items-center gap-3'>
+                  <img
+                    src='/images/author-profile.png'
+                    alt='Profile Picture'
+                    className='size-[58px] rounded-full md:size-16'
+                  />
+                  <div className='flex flex-col'>
+                    <span className='md:text-lg'>{review.user.name}</span>
+                    <span>
+                      {dayjs(review.createdAt).format('DD MMMM YYYY, HH:mm')}
+                    </span>
+                  </div>
                 </div>
 
-                {/* Comment */}
-                <span className=''>{review.comment}</span>
+                {/* Review Content */}
+                <div className='flex flex-col gap-2'>
+                  {/* Star */}
+                  <div className='flex items-center gap-[2px]'>
+                    {Array.from({ length: review.star }).map((_, index) => (
+                      <Star
+                        key={'star: ' + index}
+                        className='size-6 fill-[#FFAB0D] stroke-0'
+                      />
+                    ))}
+                  </div>
+
+                  {/* Comment */}
+                  <span className='font-semibold'>{review.comment}</span>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+
+        {/* Load More Button */}
+        {BooksQueryData.data.reviews.length > 6 && showAllReviews === false && (
+          <Button
+            onClick={() => setShowAllReviews(true)}
+            className='mx-auto h-10 max-w-[200px] border border-neutral-300 bg-white px-9 font-bold text-neutral-950 hover:bg-neutral-50 md:h-12'
+          >
+            Load More
+          </Button>
+        )}
       </div>
 
       {/* Line */}
