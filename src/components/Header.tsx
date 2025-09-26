@@ -222,7 +222,9 @@ const ProfileMenuOption = () => {
         <span className='font-semibold'>Reviews</span>
       </Link>
       {MeQuery?.data.profile.role === 'ADMIN' && (
-        <span className='font-semibold'>Admin</span>
+        <Link to='/admin'>
+          <span className='font-semibold'>Admin</span>
+        </Link>
       )}
       <span
         onClick={handleLogout}

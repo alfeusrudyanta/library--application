@@ -69,14 +69,7 @@ const Home = () => {
 
         <div className='grid w-full grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5 md:gap-5'>
           {BooksRecommendationData?.data.books.map((book) => (
-            <BookBriefCard
-              key={'Book Id:' + book.id}
-              id={book.id}
-              coverImage={book?.coverImage}
-              title={book.title}
-              authorName={book.author.name}
-              rating={book.rating}
-            />
+            <BookBriefCard key={'Book Id:' + book.id} id={book.id} />
           ))}
         </div>
       </div>

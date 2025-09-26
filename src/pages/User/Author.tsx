@@ -18,14 +18,7 @@ const Author = () => {
 
       <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5 md:gap-5'>
         {AuthorBooksQueryData?.data.books.map((book) => (
-          <BookBriefCard
-            key={book.id}
-            id={book.id}
-            authorName={AuthorBooksQueryData.data.author.name}
-            coverImage={book.coverImage}
-            rating={book.rating}
-            title={book.title}
-          />
+          <BookBriefCard key={book.id} id={book.id} />
         ))}
       </div>
     </div>

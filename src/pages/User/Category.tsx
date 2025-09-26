@@ -128,14 +128,7 @@ const Category = () => {
                 : Number(book.rating.toFixed(0)) === selectedRating
             )
             .map((book) => (
-              <BookBriefCard
-                key={book.id}
-                id={book.id}
-                title={book.title}
-                authorName={book.author.name}
-                coverImage={book.coverImage}
-                rating={book.rating}
-              />
+              <BookBriefCard key={book.id} id={book.id} />
             ))}
         </div>
       </div>

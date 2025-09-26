@@ -23,19 +23,7 @@ const Book = () => {
   return (
     <div className='flex flex-col gap-6 md:gap-16'>
       {/* Book Detail */}
-      <BookCard
-        key={BooksQueryData.data.id}
-        id={BooksQueryData.data.id}
-        coverImage={BooksQueryData.data.coverImage}
-        title={BooksQueryData.data.title}
-        categoryName={BooksQueryData.data.category.name}
-        authorName={BooksQueryData.data.author.name}
-        rating={BooksQueryData.data.rating}
-        reviewCount={BooksQueryData.data.reviewCount}
-        description={BooksQueryData.data.description}
-        availableCopies={BooksQueryData.data.availableCopies}
-        authorId={BooksQueryData.data.authorId}
-      />
+      <BookCard key={BooksQueryData.data.id} id={BooksQueryData.data.id} />
 
       {/* Line */}
       <div className='w-full border border-neutral-300' />
@@ -111,14 +99,7 @@ const Book = () => {
           {BooksRecommendationData.data.books
             .filter((book) => book.id !== BooksQueryData.data.id)
             .map((book) => (
-              <BookBriefCard
-                key={book.id}
-                authorName={book.author.name}
-                coverImage={book.coverImage}
-                id={book.id}
-                rating={book.rating}
-                title={book.title}
-              />
+              <BookBriefCard key={book.id} id={book.id} />
             ))}
         </div>
       </div>

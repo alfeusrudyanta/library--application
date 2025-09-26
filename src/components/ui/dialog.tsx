@@ -69,7 +69,7 @@ function DialogContent({
             data-slot='dialog-close'
             className='data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-5 right-4 opacity-70 transition-opacity hover:opacity-100 focus:outline-hidden disabled:pointer-events-none md:top-[30px] md:right-[26px]'
           >
-            <XIcon className='size-6' color='#0A0D12' />
+            <XIcon className='size-6 cursor-pointer' color='#0A0D12' />
             <span className='sr-only'>Close</span>
           </DialogPrimitive.Close>
         )}

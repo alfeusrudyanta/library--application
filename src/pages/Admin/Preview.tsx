@@ -20,24 +20,7 @@ const Preview = () => {
       </Link>
 
       {/* Book Detail */}
-      {BooksQueryData && (
-        <BookCard
-          key={id}
-          id={BooksQueryData.data.id}
-          coverImage={
-            BooksQueryData.data.coverImage
-              ? BooksQueryData.data.coverImage
-              : '/images/book-no-cover.jpg'
-          }
-          title={BooksQueryData.data.title}
-          categoryName={BooksQueryData.data.category.name}
-          authorName={BooksQueryData.data.author.name}
-          rating={BooksQueryData.data.rating}
-          reviewCount={BooksQueryData.data.reviewCount}
-          description={BooksQueryData.data.description}
-          availableCopies={BooksQueryData.data.availableCopies}
-        />
-      )}
+      {BooksQueryData && <BookCard key={id} id={BooksQueryData.data.id} />}
     </div>
   );
 };

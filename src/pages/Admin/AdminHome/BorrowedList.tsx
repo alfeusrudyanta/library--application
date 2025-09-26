@@ -85,18 +85,7 @@ const BorrowedList = () => {
 
         {/* Books */}
         {filteredBooks.map((book) => (
-          <FilteredBook
-            key={book.id}
-            userId={book.userId}
-            user={book.user}
-            status={book.status}
-            returnedAt={book.returnedAt}
-            id={book.id}
-            dueAt={book.dueAt}
-            borrowedAt={book.borrowedAt}
-            book={book.book}
-            bookId={book.bookId}
-          />
+          <FilteredBook key={book.id} {...book} />
         ))}
       </div>
     </div>
@@ -107,21 +96,13 @@ export default BorrowedList;
 
 type Status = 'BORROWED' | 'RETURNED' | 'LATE';
 
-const FilteredBook: React.FC<OverdueData> = ({
-  id,
-  status,
-  book,
-  dueAt,
-  bookId,
-  borrowedAt,
-  user,
-}) => {
-  const { BooksQueryData } = useBooksQuery(bookId);
+const FilteredBook: React.FC<OverdueData> = (OverdueData) => {
+  const { BooksQueryData } = useBooksQuery(OverdueData.id);
   const coverImage =
     BooksQueryData?.data.coverImage?.trim() || '/images/book-no-cover.jpg';
 
-  const borrowed = dayjs(borrowedAt);
-  const due = dayjs(dueAt);
+  const borrowed = dayjs(OverdueData.borrowedAt);
+  const due = dayjs(OverdueData.dueAt);
 
   const durationDays = due.diff(borrowed, 'day');
 
@@ -144,17 +125,14 @@ const FilteredBook: React.FC<OverdueData> = ({
   };
 
   return (
-    <div
-      key={id}
-      className='flex flex-col gap-4 rounded-[16px] bg-white p-4 shadow-[0_0_20px_0_#CBCACA40] md:gap-5 md:p-5'
-    >
+    <div className='group flex flex-col gap-4 rounded-[16px] bg-white p-4 shadow-[0_0_20px_0_#CBCACA40] md:gap-5 md:p-5'>
       {/* Status */}
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-3'>
           <span className='font-bold'>Status</span>
           <div className='rounded-[4px] bg-[#24A5000D] px-2'>
             <span className='font-bold text-[#24A500] md:text-sm'>
-              {bookStatus(status)}
+              {bookStatus(OverdueData.status)}
             </span>
           </div>
         </div>
@@ -163,7 +141,7 @@ const FilteredBook: React.FC<OverdueData> = ({
           <span className='font-bold'>Due Date</span>
           <div className='rounded-[4px] bg-[#EE1D521A] px-2'>
             <span className='font-bold text-[#EE1D52] md:text-sm'>
-              {dayjs(dueAt).format('DD MMMM YYYY')}
+              {dayjs(OverdueData.dueAt).format('DD MMMM YYYY')}
             </span>
           </div>
         </div>
@@ -176,15 +154,15 @@ const FilteredBook: React.FC<OverdueData> = ({
         {/* First Column */}
         <div className='flex flex-col gap-3 md:flex-row md:gap-4'>
           {/* Image */}
-          <Link to={`/preview/${bookId}`}>
+          <Link to={`/book/${OverdueData.bookId}`}>
             <div className='h-[140px] w-[90px] overflow-hidden'>
               <img
                 src={coverImage}
-                alt={book.title}
+                alt={OverdueData.book.title}
                 onError={(e) =>
                   (e.currentTarget.src = '/images/book-no-cover.jpg')
                 }
-                className='h-full w-full transition-all duration-300 ease-in-out hover:scale-105'
+                className='h-full w-full transition-all duration-300 ease-in-out group-hover:scale-105'
               />
             </div>
           </Link>
@@ -195,15 +173,19 @@ const FilteredBook: React.FC<OverdueData> = ({
               <span className='rounded-[6px] border border-neutral-300 px-2 font-bold md:text-sm'>
                 {BooksQueryData?.data.category.name}
               </span>
-              <Link to={`/preview/${bookId}`}>
+              <Link to={`/book/${OverdueData.bookId}`}>
                 <span className='hover:text-primary-300 text-md font-bold md:text-xl'>
-                  {book.title}
+                  {OverdueData.book.title}
                 </span>
               </Link>
-              <span className='text-neutral-700'>{book.author.name}</span>
+              <Link to={`/author/${OverdueData.book.author.id}`}>
+                <span className='text-neutral-700'>
+                  {OverdueData.book.author.name}
+                </span>
+              </Link>
               <div className='flex items-center gap-2'>
                 <span className='font-bold'>
-                  {dayjs(dueAt).format('DD MMM YYYY')}
+                  {dayjs(OverdueData.dueAt).format('DD MMM YYYY')}
                 </span>
                 <Dot className='size-3' />
                 <span className='font-bold'>
@@ -223,7 +205,9 @@ const FilteredBook: React.FC<OverdueData> = ({
         {/* Second Column */}
         <div className='flex flex-col justify-start'>
           <span className='font-semibold'>Borrower's name</span>
-          <span className='text-md font-bold md:text-xl'>{user.name}</span>
+          <span className='text-md font-bold md:text-xl'>
+            {OverdueData.user.name}
+          </span>
         </div>
       </div>
     </div>

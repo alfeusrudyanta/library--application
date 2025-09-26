@@ -13,9 +13,19 @@ const BookCartCard: React.FC<BookCartCardProps> = ({ id }) => {
       <Link to={`/preview/${id}`}>
         <div className='flex aspect-[2/3] max-w-[70px] items-center justify-between overflow-hidden md:max-w-[90px]'>
           <img
-            src={BooksQueryData?.data.coverImage ?? '/images/book-no-cover.jpg'}
-            alt='Book cover'
+            src={
+              !BooksQueryData?.data.coverImage ||
+              BooksQueryData?.data.coverImage.trim() === ''
+                ? '/images/book-no-cover.jpg'
+                : BooksQueryData?.data.coverImage.trim()
+            }
             onError={(e) => (e.currentTarget.src = '/images/book-no-cover.jpg')}
+            alt={
+              BooksQueryData?.data.coverImage
+                ? BooksQueryData?.data.title
+                : 'Book cover image'
+            }
+            loading='lazy'
             className='w-full object-cover object-center transition-all duration-300 group-hover:scale-105'
           />
         </div>

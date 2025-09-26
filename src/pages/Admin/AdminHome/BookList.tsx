@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useBooks, useBooksFilterQuery } from '@/hooks/useBooks';
+import { useBooks, useBooksFilterQuery, useBooksQuery } from '@/hooks/useBooks';
 import useWindowWidth from '@/hooks/useWindowWidth';
 import { cn } from '@/lib/utils';
 import { Search, Star, Ellipsis } from 'lucide-react';
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import type { BookDetail } from '@/types/books';
 import Loading from '@/components/Loading';
+import { toast } from 'sonner';
 
 const BookFilter = ['All', 'Available', 'Borrowed', 'Returned', 'Damaged'];
 
@@ -104,17 +105,7 @@ const BookList = () => {
 
         <div className='flex flex-col gap-4'>
           {filteredBooks.map((book) => (
-            <BookListCard
-              key={book.id}
-              id={book.id}
-              image={
-                book.coverImage ? book.coverImage : '/images/book-no-cover.jpg'
-              }
-              title={book.title}
-              categories={book.category.name}
-              author={book.author.name}
-              rating={book.rating}
-            />
+            <BookListCard key={book.id} id={book.id} />
           ))}
         </div>
       </div>
@@ -126,26 +117,16 @@ export default BookList;
 
 type BookListCardProps = {
   id: number;
-  title: string;
-  image: string;
-  categories: string;
-  author: string;
-  rating: number;
 };
 
-const BookListCard: React.FC<BookListCardProps> = ({
-  id,
-  title,
-  image,
-  categories,
-  author,
-  rating,
-}) => {
+const BookListCard: React.FC<BookListCardProps> = ({ id }) => {
+  const { BooksQueryData } = useBooksQuery(id);
+
   const isMobile = useWindowWidth();
   const menuRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
-  const { DeleteBooksMutation, success } = useBooks();
+  const { DeleteBooksMutation, success, loading, error } = useBooks();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -171,22 +152,46 @@ const BookListCard: React.FC<BookListCardProps> = ({
   useEffect(() => {
     if (success) {
       setIsDeleteOpen(false);
+      toast.success('Book deleted successfully');
     }
   }, [success]);
 
+  useEffect(() => {
+    if (error) {
+      setIsDeleteOpen(false);
+      toast.error('Cannot delete book — copies still borrowed');
+    }
+  }, [error]);
+
+  useEffect(() => {}, []);
+
+  if (!BooksQueryData) {
+    return <Loading />;
+  }
+
   return (
-    <div className='flex items-center justify-between gap-4 p-4 md:p-5'>
+    <div className='group flex items-center justify-between gap-4 p-4 md:p-5'>
       <div className='flex items-center gap-3 md:gap-4'>
         {/* Image */}
         <Link to={`/preview/${id}`}>
           <div className='h-[138px] w-[92px] overflow-hidden'>
             <img
-              src={image}
-              alt={title}
+              src={
+                !BooksQueryData?.data.coverImage ||
+                BooksQueryData?.data.coverImage.trim() === ''
+                  ? '/images/book-no-cover.jpg'
+                  : BooksQueryData?.data.coverImage.trim()
+              }
               onError={(e) =>
                 (e.currentTarget.src = '/images/book-no-cover.jpg')
               }
-              className='h-full w-full transition-all duration-300 ease-in-out hover:scale-105'
+              alt={
+                BooksQueryData?.data.coverImage
+                  ? BooksQueryData?.data.title
+                  : 'Book cover image'
+              }
+              loading='lazy'
+              className='h-full w-full transition-all duration-300 ease-in-out group-hover:scale-105'
             />
           </div>
         </Link>
@@ -194,18 +199,22 @@ const BookListCard: React.FC<BookListCardProps> = ({
         {/* Detail */}
         <div className='flex flex-col items-start gap-[2px] md:gap-1'>
           <span className='rounded-[6px] border border-neutral-300 px-2 font-bold md:text-sm'>
-            {categories}
+            {BooksQueryData?.data.category.name}
           </span>
           <Link to={`/preview/${id}`}>
             <span className='hover:text-primary-300 font-bold md:text-lg'>
-              {title}
+              {BooksQueryData?.data.title}
             </span>
           </Link>
-          <span className='text-neutral-700'>{author}</span>
+          <Link to={`/author/${BooksQueryData.data.authorId}`}>
+            <span className='text-neutral-700'>
+              {BooksQueryData?.data.author.name}
+            </span>
+          </Link>
           <div className='flex items-center gap-[2px]'>
             <Star fill='#FFAB0D' stroke='none' className='size-6' />
             <span className='font-bold text-neutral-900 md:text-sm'>
-              {rating.toFixed(1)}
+              {BooksQueryData?.data.rating.toFixed(1)}
             </span>
           </div>
         </div>
@@ -273,17 +282,23 @@ const BookListCard: React.FC<BookListCardProps> = ({
           </DialogDescription>
           <div className='flex items-center gap-4'>
             <Button
+              disabled={loading}
               onClick={() => setIsDeleteOpen(false)}
               className='bg-white text-neutral-950 hover:bg-neutral-50'
             >
               Cancel
             </Button>
             <Button
+              disabled={loading}
               onClick={handleDelete}
               variant='delete'
               className='h-10 md:h-11'
             >
-              Delete
+              {loading ? (
+                <div className='mx-auto h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent' />
+              ) : (
+                'Delete'
+              )}
             </Button>
           </div>
         </DialogContent>

@@ -92,15 +92,7 @@ const BorrowedListProfile = () => {
 
         {/* Books */}
         {filteredBooks.map((book) => (
-          <FilteredBook
-            key={book.id}
-            title={book.book.title}
-            status={book.status}
-            id={book.id}
-            dueAt={book.dueAt}
-            borrowedAt={book.borrowedAt}
-            bookId={book.bookId}
-          />
+          <FilteredBook key={book.id} {...book} />
         ))}
       </div>
     </div>
@@ -111,34 +103,18 @@ export default BorrowedListProfile;
 
 type Status = 'BORROWED' | 'RETURNED' | 'LATE';
 
-type FilteredBookType = {
-  id: number;
-  status: Status;
-  title: string;
-  dueAt: string;
-  bookId: number;
-  borrowedAt: string;
-};
-
-const FilteredBook: React.FC<FilteredBookType> = ({
-  id,
-  status,
-  title,
-  dueAt,
-  bookId,
-  borrowedAt,
-}) => {
+const FilteredBook: React.FC<Loans> = (Loans) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [selectedStar, setSelectedStar] = useState<number>(5);
   const [comment, setComment] = useState<string>('');
 
-  const { PostReviewsMutation, success } = useReview();
-  const { BooksQueryData } = useBooksQuery(bookId);
+  const { PostReviewsMutation, success, loading } = useReview();
+  const { BooksQueryData } = useBooksQuery(Loans.bookId);
   const coverImage =
     BooksQueryData?.data.coverImage?.trim() || '/images/book-no-cover.jpg';
 
-  const borrowed = dayjs(borrowedAt);
-  const due = dayjs(dueAt);
+  const borrowed = dayjs(Loans.borrowedAt);
+  const due = dayjs(Loans.dueAt);
 
   const durationDays = due.diff(borrowed, 'day');
 
@@ -168,24 +144,23 @@ const FilteredBook: React.FC<FilteredBookType> = ({
 
   const handleSubmit = () => {
     PostReviewsMutation({
-      bookId: id,
+      bookId: Loans.bookId,
       comment: comment,
       star: selectedStar,
     });
+    setComment('');
+    setSelectedStar(5);
   };
 
   return (
-    <div
-      key={id}
-      className='flex flex-col gap-4 rounded-[16px] bg-white p-4 shadow-[0_0_20px_0_#CBCACA40] md:gap-5 md:p-5'
-    >
+    <div className='group flex flex-col gap-4 rounded-[16px] bg-white p-4 shadow-[0_0_20px_0_#CBCACA40] md:gap-5 md:p-5'>
       {/* Status */}
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-3'>
           <span className='font-bold'>Status</span>
           <div className='rounded-[4px] bg-[#24A5000D] px-2'>
             <span className='font-bold text-[#24A500] md:text-sm'>
-              {bookStatus(status)}
+              {bookStatus(Loans.status)}
             </span>
           </div>
         </div>
@@ -194,7 +169,7 @@ const FilteredBook: React.FC<FilteredBookType> = ({
           <span className='font-bold'>Due Date</span>
           <div className='rounded-[4px] bg-[#EE1D521A] px-2'>
             <span className='font-bold text-[#EE1D52] md:text-sm'>
-              {dayjs(dueAt).format('DD MMMM YYYY')}
+              {dayjs(Loans.dueAt).format('DD MMMM YYYY')}
             </span>
           </div>
         </div>
@@ -207,15 +182,15 @@ const FilteredBook: React.FC<FilteredBookType> = ({
         {/* First Column */}
         <div className='flex flex-col gap-3 md:flex-row md:gap-4'>
           {/* Image */}
-          <Link to={`/preview/${bookId}`}>
+          <Link to={`/book/${Loans.id}`}>
             <div className='h-[140px] w-[90px] overflow-hidden'>
               <img
                 src={coverImage}
-                alt={title}
+                alt={Loans.book.title}
                 onError={(e) =>
                   (e.currentTarget.src = '/images/book-no-cover.jpg')
                 }
-                className='h-full w-full transition-all duration-300 ease-in-out hover:scale-105'
+                className='h-full w-full transition-all duration-300 ease-in-out group-hover:scale-105'
               />
             </div>
           </Link>
@@ -226,17 +201,19 @@ const FilteredBook: React.FC<FilteredBookType> = ({
               <span className='rounded-[6px] border border-neutral-300 px-2 font-bold md:text-sm'>
                 {BooksQueryData?.data.category.name}
               </span>
-              <Link to={`/preview/${bookId}`}>
+              <Link to={`/book/${Loans.book.id}`}>
                 <span className='hover:text-primary-300 text-md font-bold md:text-xl'>
-                  {title}
+                  {Loans.book.title}
                 </span>
               </Link>
-              <span className='text-neutral-700'>
-                {BooksQueryData.data.author.name}
-              </span>
+              <Link to={`/author/${BooksQueryData.data.authorId}`}>
+                <span className='text-neutral-700'>
+                  {BooksQueryData.data.author.name}
+                </span>
+              </Link>
               <div className='flex items-center gap-2'>
                 <span className='font-bold'>
-                  {dayjs(dueAt).format('DD MMM YYYY')}
+                  {dayjs(Loans.dueAt).format('DD MMM YYYY')}
                 </span>
                 <Dot className='size-3' />
                 <span className='font-bold'>
@@ -290,6 +267,7 @@ const FilteredBook: React.FC<FilteredBookType> = ({
           {/* Comment */}
           <textarea
             required
+            disabled={loading}
             value={comment}
             onChange={(e) => setComment(e.currentTarget.value)}
             placeholder='Please share your thoughts about this book'
@@ -297,7 +275,11 @@ const FilteredBook: React.FC<FilteredBookType> = ({
           />
 
           <div className='flex items-center gap-4'>
-            <Button onClick={handleSubmit} className='h-10 md:h-12'>
+            <Button
+              disabled={loading}
+              onClick={handleSubmit}
+              className='h-10 md:h-12'
+            >
               Send
             </Button>
           </div>
