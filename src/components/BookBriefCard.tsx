@@ -36,7 +36,7 @@ const BookBriefCard: React.FC<BookBriefCardProps> = ({ id }) => {
       {/* Details */}
       <div className='flex flex-col gap-[2px] p-3 md:gap-1 md:p-4'>
         <Link to={`/book/${id}`}>
-          <span className='hover:text-primary-300 font-bold text-neutral-900 md:text-lg'>
+          <span className='group-hover:text-primary-300 font-bold text-neutral-900 md:text-lg'>
             {BooksQueryData?.data.title}
           </span>
         </Link>

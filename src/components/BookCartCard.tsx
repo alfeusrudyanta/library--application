@@ -37,7 +37,7 @@ const BookCartCard: React.FC<BookCartCardProps> = ({ id }) => {
           {BooksQueryData?.data.category.name}
         </span>
         <Link to={`/preview/${id}`}>
-          <span className='hover:text-primary-300 text-md font-bold md:text-xl'>
+          <span className='group-hover:text-primary-300 text-md font-bold md:text-xl'>
             {BooksQueryData?.data.title}
           </span>
         </Link>

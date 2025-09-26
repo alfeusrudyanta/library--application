@@ -2,7 +2,7 @@ import useAuth from '@/hooks/useAuth';
 import { Link, useNavigate } from 'react-router-dom';
 import { Input } from './ui/input';
 import { ChevronDown, Menu, Search, XIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useWindowWidth from '@/hooks/useWindowWidth';
 import { Button } from './ui/button';
 import { useMe } from '@/hooks/useMe';
@@ -12,15 +12,26 @@ const Header = () => {
   const isMobile = useWindowWidth();
   const { isLoggedIn } = useAuth();
   const { MeQuery } = useMe();
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const [search, setSearch] = useState('');
-  // 🔹 Single combined state for search/auth/profile
-  const [openMenu, setOpenMenu] = useState<
-    'search' | 'auth' | 'profile' | null
-  >(null);
-  const toggleMenu = (menu: 'search' | 'auth' | 'profile') => {
+  const [openMenu, setOpenMenu] = useState<'search' | 'auth' | null>(null);
+  const [openProfileMenu, setOpenProfileMenu] = useState<boolean>(false);
+
+  const toggleMenu = (menu: 'search' | 'auth') => {
     setOpenMenu((prev) => (prev === menu ? null : menu));
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpenProfileMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [setOpenProfileMenu]);
 
   useEffect(() => {
     if (!isMobile) {
@@ -52,7 +63,8 @@ const Header = () => {
             />
           </Link>
           <div
-            onClick={() => toggleMenu('profile')}
+            ref={menuRef}
+            onClick={() => setOpenProfileMenu((prev) => !prev)}
             className='flex cursor-pointer items-center gap-4'
           >
             <img
@@ -66,7 +78,7 @@ const Header = () => {
             <ChevronDown
               className={cn(
                 'size-6 transition-all duration-300',
-                openMenu === 'profile' && 'rotate-180'
+                openProfileMenu && 'rotate-180'
               )}
             />
           </div>
@@ -80,18 +92,22 @@ const Header = () => {
             onClick={() => toggleMenu('search')}
             className='size-6 cursor-pointer'
           />
-          <img
-            src='/icons/header-bag.svg'
-            alt='Shopping Cart'
-            className='size-[28px] cursor-pointer'
-          />
-          {isLoggedIn && (
+          <Link to='/cart'>
             <img
-              onClick={() => toggleMenu('profile')}
-              src='/images/author-profile.png'
-              alt='profile-picture'
-              className='size-10 cursor-pointer rounded-full'
+              src='/icons/header-bag.svg'
+              alt='Shopping Cart'
+              className='size-[28px] cursor-pointer'
             />
+          </Link>
+          {isLoggedIn && (
+            <div ref={menuRef}>
+              <img
+                onClick={() => setOpenProfileMenu((prev) => !prev)}
+                src='/images/author-profile.png'
+                alt='profile-picture'
+                className='size-10 cursor-pointer rounded-full'
+              />
+            </div>
           )}
 
           {!isLoggedIn &&
@@ -129,7 +145,7 @@ const Header = () => {
       )}
 
       {/* Profile menu (desktop + mobile) */}
-      {openMenu === 'profile' && <ProfileMenuOption />}
+      {openProfileMenu && <ProfileMenuOption />}
     </div>
   );
 };

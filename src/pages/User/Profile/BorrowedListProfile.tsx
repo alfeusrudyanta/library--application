@@ -182,7 +182,7 @@ const FilteredBook: React.FC<Loans> = (Loans) => {
         {/* First Column */}
         <div className='flex flex-col gap-3 md:flex-row md:gap-4'>
           {/* Image */}
-          <Link to={`/book/${Loans.id}`}>
+          <Link to={`/book/${BooksQueryData.data.id}`}>
             <div className='h-[140px] w-[90px] overflow-hidden'>
               <img
                 src={coverImage}
@@ -202,7 +202,7 @@ const FilteredBook: React.FC<Loans> = (Loans) => {
                 {BooksQueryData?.data.category.name}
               </span>
               <Link to={`/book/${Loans.book.id}`}>
-                <span className='hover:text-primary-300 text-md font-bold md:text-xl'>
+                <span className='group-hover:text-primary-300 text-md font-bold md:text-xl'>
                   {Loans.book.title}
                 </span>
               </Link>

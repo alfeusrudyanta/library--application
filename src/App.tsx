@@ -39,7 +39,7 @@ const UserLayout = () => {
   return (
     <div className='flex min-h-screen flex-col'>
       <Header />
-      <main className='flex-1 p-4 md:px-[120px] md:pt-[128px] md:pb-[118px]'>
+      <main className='flex-1 px-4 pt-20 pb-4 md:px-[120px] md:pt-[128px] md:pb-[118px]'>
         <Outlet />
       </main>
       <Footer />

@@ -67,7 +67,7 @@ const CardComponent: React.FC<CardComponentProps> = ({ id }) => {
             {BooksQueryData?.data.category.name}
           </span>
           <Link to={`/book/${id}`}>
-            <span className='hover:text-primary-300 text-display-xs md:text-display-sm font-bold'>
+            <span className='group-hover:text-primary-300 text-display-xs md:text-display-sm font-bold'>
               {BooksQueryData?.data.title}
             </span>
           </Link>

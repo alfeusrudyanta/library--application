@@ -174,7 +174,7 @@ const FilteredBook: React.FC<OverdueData> = (OverdueData) => {
                 {BooksQueryData?.data.category.name}
               </span>
               <Link to={`/book/${OverdueData.bookId}`}>
-                <span className='hover:text-primary-300 text-md font-bold md:text-xl'>
+                <span className='group-hover:text-primary-300 text-md font-bold md:text-xl'>
                   {OverdueData.book.title}
                 </span>
               </Link>
