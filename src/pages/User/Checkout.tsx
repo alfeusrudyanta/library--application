@@ -46,8 +46,11 @@ const Checkout = () => {
   };
 
   useEffect(() => {
+    const currentPath = location.pathname;
     return () => {
-      localStorage.removeItem('checkout');
+      if (location.pathname !== currentPath) {
+        localStorage.removeItem('checkout');
+      }
     };
   }, []);
 

@@ -1,13 +1,28 @@
 import Loading from '@/components/Loading';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { useMe } from '@/hooks/useMe';
+import { useState } from 'react';
 
 const ProfileMenu = () => {
-  const { MeQuery } = useMe();
+  const { MeQuery, PatchMeMutation, loading } = useMe();
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [updatedName, setUpdatedName] = useState<string>(
+    () => MeQuery?.data.profile.name ?? ''
+  );
 
   if (!MeQuery) {
     return <Loading />;
   }
+
+  const handleSubmit = () => {
+    const data = {
+      name: updatedName,
+    };
+    PatchMeMutation(data);
+    setIsOpen(false);
+  };
 
   return (
     <div className='flex flex-col gap-[15px] md:gap-6'>
@@ -43,8 +58,44 @@ const ProfileMenu = () => {
             <span className='font-bold'>081234567890</span>
           </div>
         </div>
-        <Button className='h-11 md:h-11'>Update Profile</Button>
+        <Button
+          onClick={() => setIsOpen((prev) => !prev)}
+          className='h-11 md:h-11'
+        >
+          Update Profile
+        </Button>
       </div>
+
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent>
+          <DialogTitle>Update Profile</DialogTitle>
+          <div className='flex flex-col gap-4 md:gap-5'>
+            <div className='flex flex-col gap-1'>
+              <span className='font-extrabold'>Name</span>
+              <Input
+                type='text'
+                value={updatedName}
+                onChange={(e) => setUpdatedName(e.target.value)}
+              />
+            </div>
+
+            <Button
+              disabled={
+                updatedName === MeQuery.data.profile.name ||
+                updatedName.length < 4
+              }
+              onClick={handleSubmit}
+              className='h-10 md:h-11'
+            >
+              {loading ? (
+                <div className='mx-auto h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent' />
+              ) : (
+                'Update'
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

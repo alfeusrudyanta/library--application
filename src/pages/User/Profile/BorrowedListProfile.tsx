@@ -217,10 +217,8 @@ const FilteredBook: React.FC<Loans> = (Loans) => {
                 </span>
                 <Dot className='size-3' />
                 <span className='font-bold'>
-                  <span>
-                    Duration {Math.max(durationDays, 0)} day
-                    {durationDays > 1 ? 's' : ''}
-                  </span>
+                  {Loans.status !== 'RETURNED' &&
+                    `Duration ${Math.max(durationDays, 0)} day${durationDays > 1 ? 's' : ''}`}
                 </span>
               </div>
             </div>

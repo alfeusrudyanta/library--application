@@ -13,10 +13,16 @@ const Header = () => {
   const { isLoggedIn } = useAuth();
   const { MeQuery } = useMe();
   const menuRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
 
   const [search, setSearch] = useState('');
   const [openMenu, setOpenMenu] = useState<'search' | 'auth' | null>(null);
   const [openProfileMenu, setOpenProfileMenu] = useState<boolean>(false);
+
+  const [cartList, setCartList] = useState<number[]>(() => {
+    const cartListString = localStorage.getItem('cart');
+    return cartListString ? JSON.parse(cartListString) : [];
+  });
 
   const toggleMenu = (menu: 'search' | 'auth') => {
     setOpenMenu((prev) => (prev === menu ? null : menu));
@@ -24,7 +30,12 @@ const Header = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
         setOpenProfileMenu(false);
       }
     };
@@ -32,6 +43,16 @@ const Header = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [setOpenProfileMenu]);
+
+  useEffect(() => {
+    const handleCartUpdate = () => {
+      const cart = localStorage.getItem('cart');
+      setCartList(cart ? JSON.parse(cart) : []);
+    };
+
+    window.addEventListener('cartUpdated', handleCartUpdate);
+    return () => window.removeEventListener('cartUpdated', handleCartUpdate);
+  }, []);
 
   useEffect(() => {
     if (!isMobile) {
@@ -56,14 +77,19 @@ const Header = () => {
       {isLoggedIn && !isMobile && (
         <div className='flex flex-1 items-center justify-end gap-6'>
           <Link to='/cart'>
-            <img
-              src='/icons/header-bag.svg'
-              alt='Shopping Cart Icon'
-              className='size-8'
-            />
+            <div className='relative'>
+              <img
+                src='/icons/header-bag.svg'
+                alt='Shopping Cart Icon'
+                className='size-8'
+              />
+              <span className='absolute top-0 right-0 flex size-4 items-center justify-center rounded-full bg-[#EE1D52] text-[10px] font-bold text-white'>
+                {cartList.length}
+              </span>
+            </div>
           </Link>
           <div
-            ref={menuRef}
+            ref={buttonRef}
             onClick={() => setOpenProfileMenu((prev) => !prev)}
             className='flex cursor-pointer items-center gap-4'
           >
@@ -93,14 +119,16 @@ const Header = () => {
             className='size-6 cursor-pointer'
           />
           <Link to='/cart'>
-            <img
-              src='/icons/header-bag.svg'
-              alt='Shopping Cart'
-              className='size-[28px] cursor-pointer'
-            />
+            <div className='relative'>
+              <img
+                src='/icons/header-bag.svg'
+                alt='Shopping Cart'
+                className='size-[28px] cursor-pointer'
+              />
+            </div>
           </Link>
           {isLoggedIn && (
-            <div ref={menuRef}>
+            <div ref={buttonRef}>
               <img
                 onClick={() => setOpenProfileMenu((prev) => !prev)}
                 src='/images/author-profile.png'
@@ -145,7 +173,11 @@ const Header = () => {
       )}
 
       {/* Profile menu (desktop + mobile) */}
-      {openProfileMenu && <ProfileMenuOption />}
+      {openProfileMenu && (
+        <div ref={menuRef}>
+          <ProfileMenuOption />
+        </div>
+      )}
     </div>
   );
 };
@@ -228,23 +260,23 @@ const ProfileMenuOption = () => {
 
   return (
     <div className='md:max-[184px] absolute top-[64px] left-0 flex w-full max-w-[calc(100%)-32px] flex-col gap-4 rounded-[16px] bg-white p-4 shadow-[0_0_20px_0_#CBCACA40] md:top-[74px] md:right-[120px] md:left-auto md:max-w-[185px]'>
-      <Link to='/profile?tab=profile'>
+      <Link to='/profile?tab=profile' className='hover:text-primary-300'>
         <span className='font-semibold'>Profile</span>
       </Link>
-      <Link to='/profile?tab=borrowed_list'>
+      <Link to='/profile?tab=borrowed_list' className='hover:text-primary-300'>
         <span className='font-semibold'>Borrowed List</span>
       </Link>
-      <Link to='/profile?tab=reviews'>
+      <Link to='/profile?tab=reviews' className='hover:text-primary-300'>
         <span className='font-semibold'>Reviews</span>
       </Link>
       {MeQuery?.data.profile.role === 'ADMIN' && (
-        <Link to='/admin'>
+        <Link to='/admin' className='hover:text-primary-300'>
           <span className='font-semibold'>Admin</span>
         </Link>
       )}
       <span
         onClick={handleLogout}
-        className='cursor-pointer font-semibold text-[#EE1D52]'
+        className='cursor-pointer font-semibold text-[#EE1D52] hover:text-red-700'
       >
         Logout
       </span>

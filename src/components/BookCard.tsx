@@ -28,6 +28,7 @@ const CardComponent: React.FC<CardComponentProps> = ({ id }) => {
       localStorage.setItem('cart', JSON.stringify(updated));
       setInCart(false);
     }
+    window.dispatchEvent(new Event('cartUpdated'));
   };
 
   const handleBorrow = () => {
@@ -124,7 +125,7 @@ const CardComponent: React.FC<CardComponentProps> = ({ id }) => {
             onClick={handleCart}
             disabled={
               !inCart && (BooksQueryData?.data?.availableCopies ?? 0) <= 0
-            } // disable only if trying to add and no copies
+            }
             className='h-10 max-w-[200px] border border-neutral-300 bg-white px-9 font-bold text-neutral-950 hover:bg-neutral-50 md:h-12'
           >
             {inCart ? 'Remove Book' : 'Add to Cart'}
