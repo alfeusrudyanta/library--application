@@ -15,7 +15,7 @@ const Home = () => {
   const { BooksRecommendationData } = useBooksRecommendationQuery({
     by: 'rating',
     categoryId: undefined,
-    limit: 10,
+    limit: 20,
   });
 
   if (!BooksRecommendationData) {
