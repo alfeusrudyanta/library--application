@@ -1,6 +1,7 @@
 import AuthorCard from '@/components/AuthorCard';
 import BookBriefCard from '@/components/BookBriefCard';
 import Loading from '@/components/Loading';
+import { Button } from '@/components/ui/button';
 import { genreMenu, imageLink } from '@/constant/home';
 import { useBooksRecommendationQuery } from '@/hooks/useBooks';
 import { cn } from '@/lib/utils';
@@ -10,6 +11,7 @@ import { Link } from 'react-router-dom';
 
 const Home = () => {
   const [imageIndex, setImageIndex] = useState<number>(0);
+  const [showAllReviews, setShowAllReviews] = useState<boolean>(false);
   const { BooksRecommendationData } = useBooksRecommendationQuery({
     by: 'rating',
     categoryId: undefined,
@@ -19,6 +21,10 @@ const Home = () => {
   if (!BooksRecommendationData) {
     return <Loading />;
   }
+
+  const displayedFilter = showAllReviews
+    ? BooksRecommendationData.data.books
+    : BooksRecommendationData.data.books.slice(0, 10);
 
   return (
     <div className='flex flex-col gap-6 md:gap-12'>
@@ -68,10 +74,21 @@ const Home = () => {
         </span>
 
         <div className='grid w-full grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5 md:gap-5'>
-          {BooksRecommendationData?.data.books.map((book) => (
+          {displayedFilter.map((book) => (
             <BookBriefCard key={'Book Id:' + book.id} id={book.id} />
           ))}
         </div>
+
+        {/* Load More Button */}
+        {BooksRecommendationData.data.books.length > 10 &&
+          showAllReviews === false && (
+            <Button
+              onClick={() => setShowAllReviews(true)}
+              className='mx-auto h-10 max-w-[200px] border border-neutral-300 bg-white px-9 font-bold text-neutral-950 hover:bg-neutral-50 md:h-12'
+            >
+              Load More
+            </Button>
+          )}
       </div>
 
       {/* Authors */}
