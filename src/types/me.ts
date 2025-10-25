@@ -107,4 +107,5 @@ export type {
   GetMeReviewsParamsReq,
   GetMeReviewsRes,
   Loans,
+  BorrowedStatus,
 };
